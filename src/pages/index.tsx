@@ -1,21 +1,58 @@
-import { styled } from "@/styles"
+import { Card } from "@/components/Card";
+import { HomeContainer } from "@/styles/pages/home";
+import {useKeenSlider} from 'keen-slider/react'
 
-const Button = styled('button',{
-  backgroundColor:'$rocketseat',
-  borderRadius: 4,
-  border: 0,
-  padding:5,
-  span: {
-    fontWeight:'bold'
-  },
-  '&:hover':{
-    filter: 'brightness(0.8)'
-  },
-  cursor: 'pointer'
-})
+import 'keen-slider/keen-slider.min.css'
+import { stripe } from "@/lib/stripe";
+import { GetServerSideProps } from "next";
+import Stripe from "stripe";
 
-export default function Home() {
+interface HomeProps {
+  products: {
+    id: string
+    name: string
+    imageUrl: string
+    price: number
+  }[]
+}
+
+export default function Home({products}:HomeProps) {
+
+  const [sliderRef] = useKeenSlider({
+    slides: {
+      perView:3,
+      spacing: 48,
+    }
+  })
+
   return (
-    <Button><span>Teste</span>Enviar</Button>
+    <HomeContainer ref={sliderRef} className='keen-slider'>
+      {products.map(product => {
+        return <Card key={product.id} image={product.imageUrl} price={product.price} name={product.name} />
+      })}
+    </HomeContainer>
   )
+}
+
+export const getServerSideProps:GetServerSideProps = async () => {
+  const response = await stripe.products.list({
+    expand: ['data.default_price']
+  })
+  
+  const products = response.data.map(OBJ => {
+    const price = OBJ.default_price as Stripe.Price
+    return {
+      id: OBJ.id,
+      name: OBJ.name,
+      imageUrl: OBJ.images[0],
+      price: price.unit_amount! / 100,
+
+    }
+  })
+
+  return{
+    props: {
+      products,
+    }
+  }
 }
