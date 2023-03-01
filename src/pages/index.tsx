@@ -1,11 +1,11 @@
 import { Card } from "@/components/Card";
 import { HomeContainer } from "@/styles/pages/home";
-import {useKeenSlider} from 'keen-slider/react'
-
+import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
 import { stripe } from "@/lib/stripe";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import Stripe from "stripe";
+import Link from 'next/link'
 
 interface HomeProps {
   products: {
@@ -16,11 +16,11 @@ interface HomeProps {
   }[]
 }
 
-export default function Home({products}:HomeProps) {
+export default function Home({ products }: HomeProps) {
 
   const [sliderRef] = useKeenSlider({
     slides: {
-      perView:3,
+      perView: 3,
       spacing: 48,
     }
   })
@@ -28,31 +28,44 @@ export default function Home({products}:HomeProps) {
   return (
     <HomeContainer ref={sliderRef} className='keen-slider'>
       {products.map(product => {
-        return <Card key={product.id} image={product.imageUrl} price={product.price} name={product.name} />
+        return (
+          <Link key={product.id} href={`product/${product.id}`}>
+            <Card
+              image={product.imageUrl}
+              price={product.price}
+              name={product.name}
+            />
+          </Link>
+          
+        )
       })}
     </HomeContainer>
   )
 }
 
-export const getServerSideProps:GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const response = await stripe.products.list({
     expand: ['data.default_price']
   })
-  
+
   const products = response.data.map(OBJ => {
     const price = OBJ.default_price as Stripe.Price
     return {
       id: OBJ.id,
       name: OBJ.name,
       imageUrl: OBJ.images[0],
-      price: price.unit_amount! / 100,
+      price: new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }).format(price.unit_amount! / 100),
 
     }
   })
 
-  return{
+  return {
     props: {
       products,
-    }
+    },
+    revalidate: 60 * 60 * 2,
   }
 }

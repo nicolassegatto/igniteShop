@@ -1,7 +1,7 @@
 import { styled } from "..";
 
-export const HeaderStyle = styled('header', {
-  padding: '2rem 0',
+export const HeaderStyle = styled('a', {
+  padding: '2rem 1rem 2rem 1rem',
   width: '100%',
   maxWidth: 1180,
   margin: '0 auto',

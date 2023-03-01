@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 export function Header() {
   return(
-    <HeaderStyle>
+    <HeaderStyle href='/'>
       <Image src={logoImg} alt="LOGO IGNITE Shop" />
     </HeaderStyle>
   )
