@@ -5,7 +5,7 @@ import 'keen-slider/keen-slider.min.css'
 interface CardProps {
   name: string
   image: string
-  price: number
+  price: string
 }
 
 export function Card({ name, image, price }: CardProps) {

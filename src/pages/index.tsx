@@ -6,13 +6,14 @@ import { stripe } from "@/lib/stripe";
 import { GetStaticProps } from "next";
 import Stripe from "stripe";
 import Link from 'next/link'
+import Head from "next/head";
 
 interface HomeProps {
   products: {
     id: string
     name: string
     imageUrl: string
-    price: number
+    price: string
   }[]
 }
 
@@ -26,20 +27,24 @@ export default function Home({ products }: HomeProps) {
   })
 
   return (
-    <HomeContainer ref={sliderRef} className='keen-slider'>
-      {products.map(product => {
-        return (
-          <Link key={product.id} href={`product/${product.id}`}>
-            <Card
-              image={product.imageUrl}
-              price={product.price}
-              name={product.name}
-            />
-          </Link>
-          
-        )
-      })}
-    </HomeContainer>
+    <>
+      <Head>
+        <title>Home | Ignite Shop</title>
+      </Head>
+      <HomeContainer ref={sliderRef} className='keen-slider'>
+        {products.map(product => {
+          return (
+            <Link key={product.id} prefetch={false} href={`product/${product.id}`}>
+              <Card
+                image={product.imageUrl}
+                price={product.price}
+                name={product.name}
+              />
+            </Link>
+          )
+        })}
+      </HomeContainer>
+    </>
   )
 }
 

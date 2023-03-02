@@ -6,7 +6,6 @@ export const CardContainer = styled('div', {
   cursor: 'pointer',
   position: 'relative',
   overflow: 'hidden',
-  
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
